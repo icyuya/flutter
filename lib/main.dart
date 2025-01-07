@@ -123,11 +123,19 @@ class TakePictureScreenState extends State<TakePictureScreen>
               future: _initializeControllerFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.done) {
+                  final scale = MediaQuery.of(context).size.width /
+                      _controller.value.previewSize!.height;
                   return Center(
-                    child: CameraPreview(_controller),
+                    child: Transform.scale(
+                      scale: scale,
+                      child: AspectRatio(
+                        aspectRatio: _controller.value.aspectRatio,
+                        child: CameraPreview(_controller),
+                      ),
+                    ),
                   );
                 } else {
-                  return const CircularProgressIndicator();
+                  return const Center(child: CircularProgressIndicator());
                 }
               },
             ),
@@ -142,7 +150,7 @@ class TakePictureScreenState extends State<TakePictureScreen>
                 ),
               ),
             if (_isLoading)
-              Center(
+              const Center(
                 child: CircularProgressIndicator(),
               ),
             AnimatedBuilder(
@@ -247,6 +255,7 @@ class VectorFieldPainter extends CustomPainter {
     for (double x = 0; x < size.width; x += 50) {
       for (double y = 0; y < size.height; y += 50) {
         final position = Offset(x, y);
+        if (x > size.width || y > size.height) continue;
         final vector = _calculateVector(position);
         _drawArrow(canvas, position, vector, paint);
       }
